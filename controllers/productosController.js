@@ -3,6 +3,9 @@ const Productos = require('../models/Productos');
 const multer = require('multer')
 const shortid = require('shortid')
 
+const fs = require('fs');
+const path = require('path');
+
 const configuracionMulter = {
     storage: fileStorage = multer.diskStorage({
         destination: (req, file, cb) => {
@@ -122,5 +125,44 @@ exports.actualizarProducto = async (req, res, next) => {
         res.json({
             mensaje: 'Ocurrió un error' + error
         })
+    }
+}
+//Eliminar Producto
+exports.eliminarProducto = async (req, res, next) => {
+    try {
+        const idProducto = req.params.idProducto;
+
+        // Buscar el producto para obtener su imagen
+        const producto = await Productos.findById(idProducto);
+
+        if (!producto) {
+            return res.status(404).json({ mensaje: 'Producto no encontrado' });
+        }
+
+        // Verificar si el producto tiene una imagen y eliminarla
+        if (producto.imagen) {
+            const rutaImagen = path.join(__dirname, '../uploads/', producto.imagen);
+console.log("Ruta Imagen:  ",rutaImagen)
+            // Verificar si el archivo existe antes de eliminarlo
+            fs.unlink(rutaImagen, (error) => {
+                if (error) {
+                    console.log(`Error eliminando la imagen: ${error}`);
+                    // Si es importante reportar el error, puedes enviar una respuesta con el error o continuar
+                } else {
+                    console.log('Imagen eliminada correctamente');
+                }
+            });
+        }
+
+        // Eliminar el producto de la base de datos
+        await Productos.findOneAndDelete({ _id: idProducto });
+
+        res.json({
+            mensaje: 'Producto y su imagen eliminados con éxito'
+        });
+    } catch (error) {
+        res.status(500).json({
+            mensaje: 'Ocurrió un error: ' + error
+        });
     }
 }

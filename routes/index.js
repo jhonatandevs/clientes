@@ -20,6 +20,7 @@ module.exports = function () {
     router.get('/productos/:idProducto',productosController.mostrarProductosPorId)
     router.put('/productos/:idProducto', productosController.subirArchivo, 
         productosController.actualizarProducto)
+    router.delete('/productos/:idProducto', productosController.eliminarProducto)
     
     return router;
 }
