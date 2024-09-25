@@ -13,4 +13,4 @@ const productosSchema= new Schema({
         type:String
     }
 })
-module.exports= mongoose.model('Producto',productosSchema)
+module.exports= mongoose.model('Productos',productosSchema)
